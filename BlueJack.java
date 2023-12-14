@@ -56,7 +56,7 @@ public class Bluejack{
         so we can keep track of them.) then, if the index was not used before, it sets the value
         inside that random index of the mainarray as value inside the result array (starting from first index)
         */
-        int[] alreadySaved = new int[mainArray.length]; // already saved indexes. (values are preset as 0)
+        int[] alreadySaved = new int[mainArray.length]; // indexes are already preset. (values are preset as 0)
         Card[] resultArray = new Card[mainArray.length];
         Random rand = new Random();
         boolean save = true;
@@ -68,7 +68,7 @@ public class Bluejack{
             /* 
             sets a random index value (from 1 to length+1) [because the value of 0 is already preset in the array 
             which the algorithm skips since it's treated as an already existing value (while the value of 0th index
-            is not saved in the result array). "if(save)" fails, savingIndex never reaches the needed value to end
+            is not saved in the result array). "if(save)" on line 34 fails, savingIndex never reaches the needed value to end
             the loop, and the 0th index will never be saved in the result array.]
             */
             for(int i = 0; i<alreadySaved.length; i++){
