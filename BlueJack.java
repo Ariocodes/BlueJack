@@ -3,14 +3,31 @@ class Card{
     private int val;
     private String col;
     private boolean positive;
-    public Card(int InputValue, String InputColor, boolean InputSign){
-        col = InputColor;
-        positive = InputSign;
-        if(!positive){
-            val = InputValue * -1;
+    private String cardType;
+    public Card(int InputValue, String InputColor, boolean InputSign, boolean isLuckyCard){
+        if(isLuckyCard){ // for lucky cards
+            Random rand = new Random();
+            col = InputColor; // set as none
+            val = InputValue; // set as 0
+            int cardChance = rand.nextInt(1, 3);
+            switch(cardChance){
+                case 1:
+                    cardType = "flip";
+                    break;
+                case 2:
+                    cardType = "double";
+                    break;
+            }
         }
-        else{
-            val = InputValue;
+        else{ // for normal cards
+            cardType = "normal";
+            col = InputColor;
+            if(!InputSign){
+                val = InputValue * -1;
+            }
+            else{
+                val = InputValue;
+            }
         }
     }
     public int value(){
@@ -19,14 +36,17 @@ class Card{
     public String color(){
         return col;
     }
+    public String getCardType(){
+        return cardType;
+    }
 }
 
 public class Bluejack{
-    public static Card[] DeckMaker(){
-        Card[] deck = new Card[40];
-        int number = 0;
+    public static Card[] DeckMaker(int amountOfCards){
+        Card[] deck = new Card[amountOfCards];
+        int cardNumber = 0;
+        String color = null;
         for(int i = 0; i<4; i++){ //making four decks
-            String color = null;
             switch(i){
                 case 0:
                     color = "Blue";
@@ -42,8 +62,8 @@ public class Bluejack{
                     break;
             }
             for(int j = 0; j<10; j++){ //making a class object for each card
-                deck[number] = new Card(j+1, color, true);
-                number++;
+                deck[cardNumber] = new Card(j+1, color, true, false);
+                cardNumber++;
             }
         }
         return deck;
@@ -86,18 +106,126 @@ public class Bluejack{
         return resultArray;
     }
 
-    public static void main(String[] args){
-        Card[] gameDeck = DeckMaker();
-        
-        for(int i = 0; i<gameDeck.length; i++){
-            System.out.println(gameDeck[i].value() + " " + gameDeck[i].color());
-        }
-    
-        Card[] shuffledDeck = shuffle(gameDeck);
-        System.out.println();
+    public static Card[] randomCards(int length){
+        Random rand = new Random();
+        Card[] result = new Card[length];
 
+        int randValue = 0;
+        int randColor = 0;
+        int randSign = 0;
+
+        boolean isPositive = true;
+        String color = "";
+
+        int chance = 0;
+        for(int i = 0; i<length; i++){
+            randValue = rand.nextInt(1, 7);
+            randColor = rand.nextInt(1, 5);
+            randSign = rand.nextInt(1, 3);
+            switch(randSign){
+                case 1:
+                    isPositive = true;
+                    break;
+                case 2:
+                    isPositive = false;
+                    break;
+            }
+            switch(randColor){
+                case 1:
+                    color = "Blue";
+                    break;
+                case 2:
+                    color = "Yellow";
+                    break;
+                case 3:
+                    color = "Red";
+                    break;
+                case 4:
+                    color = "Green";
+                    break;
+            }
+            if(i<3){
+                result[i] = new Card(randValue, color, isPositive, false);
+            }
+            else{
+                chance = rand.nextInt(1, 6);
+                switch(chance){
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        result[i] = new Card(randValue, color, isPositive, false);
+                        break;
+                    case 5:
+                        result[i] = new Card(0, "none", true, true);
+                        break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args){
+        Card[] gameDeck = DeckMaker(40);
+        Card[] shuffledDeck = shuffle(gameDeck);
+
+
+
+        // giving the first 5 cards to each player
+        Card[] playerDeck = new Card[10];
+        Card[] computerDeck = new Card[10];
+        for(int i = 0; i<(playerDeck.length/2); i++){
+            playerDeck[i] = shuffledDeck[i];
+            computerDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
+        }
+        
+        /*
+        // To check if the cards are given to players properly
+        System.out.println("Shuffled Deck:");
         for(int i = 0; i<shuffledDeck.length; i++){
             System.out.println(shuffledDeck[i].value() + " " + shuffledDeck[i].color());
+        }
+        for(int i = 0; i<(playerDeck.length/2); i++){
+            String player = String.format("%d %s", playerDeck[i].value(), playerDeck[i].color());
+            String computer = String.format("%d %s", computerDeck[i].value(), computerDeck[i].color());
+            System.out.println("playerDeck: " + player + " computerDeck: " + computer);
+        }
+        */
+
+        // giving random cards to players
+        Card[] randoms1 = randomCards(5);
+        for(int i = 5; i<playerDeck.length; i++){
+            playerDeck[i] = randoms1[i-5];
+        }
+        Card[] randoms2 = randomCards(5);
+        for(int i = 5; i<computerDeck.length; i++){
+            computerDeck[i] = randoms2[i-5];
+        }
+
+        System.out.println("Player hands:");
+        String player = "";
+        String computer = "";
+        for(int i = 0; i<playerDeck.length; i++){
+            if(playerDeck[i].getCardType() == "normal"){
+                player = String.format("%d %s", playerDeck[i].value(), playerDeck[i].color());
+            }
+            else if(playerDeck[i].getCardType() == "double"){
+                player = "x2";
+            }
+            else if(playerDeck[i].getCardType() == "flip"){
+                player = "+/-";
+            }
+
+            if(computerDeck[i].getCardType() == "normal"){
+                computer = String.format("%d %s", computerDeck[i].value(), computerDeck[i].color());
+            }
+            else if(computerDeck[i].getCardType() == "double"){
+                computer = "x2";
+            }
+            else if(computerDeck[i].getCardType() == "flip"){
+                computer = "+/-";
+            }
+            System.out.println("playerDeck: " + player + " computerDeck: " + computer);
         }
     }
 }
