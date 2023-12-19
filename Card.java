@@ -31,6 +31,15 @@ class Card{
             }
         }
     }
+    public void setValue(int vl){
+        val = vl;
+    }
+    public void setColor(String cl){
+        col = cl;
+    }
+    public void setCardType(String type){
+        cardType = type;
+    }
     public int value(){
         return val;
     }

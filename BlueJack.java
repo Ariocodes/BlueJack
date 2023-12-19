@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.Scanner;
 
 public class Bluejack{
     public static Card[] DeckMaker(int amountOfCards){
@@ -151,44 +152,169 @@ public class Bluejack{
         return resultArray;
     }
 
-    public static void pre_printer(Card[] deckOne, Card[] deckTwo){
-        // Basic function for troubleshooting (a basic printer)
-        String one = "";
-        String two = "";
-        for(int i = 0; i<deckOne.length; i++){
-            if(deckOne[i].getCardType() == "normal"){
-                one = String.format("%d %s", deckOne[i].value(), deckOne[i].color());
-            }
-            else if(deckOne[i].getCardType() == "double"){
-                one = "x2";
-            }
-            else if(deckOne[i].getCardType() == "flip"){
-                one = "+/-";
-            }
+    public static String cardPrinter(Card card){
+        String ANSI_RESET = "\u001B[0m";
+        String ANSI_BLUE = "\u001B[36m";
+        String ANSI_YELLOW = "\u001B[33m";
+        String ANSI_RED = "\u001B[31m";
+        String ANSI_GREEN = "\u001B[32m";
+        String ANSI_PURPLE = "\u001B[35m";
+        String text = "";
+        if(card.color() == "Blue"){
+            text = String.format(ANSI_BLUE + " [B%3d] " + ANSI_RESET, card.value());
+        }
+        else if(card.color() == "Yellow"){
+            text = String.format(ANSI_YELLOW + " [Y%3d] " + ANSI_RESET, card.value());
+        }
+        else if(card.color() == "Red"){
+            text = String.format(ANSI_RED + " [R%3d] " + ANSI_RESET, card.value());
+        }
+        else if(card.color() == "Green"){
+            text = String.format(ANSI_GREEN + " [G%3d] " + ANSI_RESET, card.value());
+        }
+        if(card.getCardType() == "flip"){
+            text = ANSI_PURPLE + "  [+/-] " + ANSI_RESET;
+        }
+        if(card.getCardType() == "double"){
+            text = ANSI_PURPLE + "  [x2]  " + ANSI_RESET;
+        }
+        return text;
+    }
 
-            if(deckTwo[i].getCardType() == "normal"){
-                two = String.format("%d %s", deckTwo[i].value(), deckTwo[i].color());
+    public static void gameplay(Card[] mainDeck, Card[] playerDeck, Card[] computerDeck){
+        Scanner sc = new Scanner(System.in);
+        Random rd = new Random();
+        Player player = new Player(playerDeck);
+        Computer computer = new Computer(computerDeck);
+
+        System.out.print("Press Enter to start!");
+        String started = sc.nextLine();
+        
+        boolean winner = false;
+        boolean winnerIsPlayer = false;
+        int[] scores = {0, 0};
+
+        String computerBoard = "Computer's board: | ";
+        String playerBoard = "Player's board:   | ";
+        int deckIndex = 29;
+        boolean playerDone = false;
+        boolean playerFullyDone = false;
+        boolean computerFullyDone = false;
+        boolean computerDone = false;
+        while(!winner){
+            //Drawing the board
+            System.out.println();
+            System.out.println(computer.printHand());
+            System.out.println(computerBoard);
+            System.out.println(playerBoard);
+            System.out.println(player.printHand());
+            if(!playerFullyDone){
+                while(!playerDone){
+                    // asking for action
+                    System.out.print("Player: 1.draw, 2.card, 3.stand, 4.end turn: ");
+                    int action = sc.nextInt();
+                    if(action == 1){
+                        //adding the card to the board first
+                        playerBoard += cardPrinter(mainDeck[deckIndex]);
+                        //adding its value and then setting it as the last used card
+                        player.totalValue += mainDeck[deckIndex].value();
+                        player.lastUsedCard = mainDeck[deckIndex];
+                        mainDeck[deckIndex] = null;
+                        deckIndex--; // since we are drawing cards
+                        playerDone = true;
+                    }
+                    if(action == 2){
+                        int chosenCard = 0;
+                        do{
+                        System.out.print("Select card (1-4): ");
+                        chosenCard = sc.nextInt();
+                        } while(player.hand[chosenCard-1] == null); // making sure the card is not used before
+
+                        playerBoard += cardPrinter(player.hand[chosenCard-1]);
+                        player.useCard(chosenCard);
+                        playerDone = true;
+                    }
+                    if(action == 3){
+                        // breaks out and stays out of loop until the game is over
+                        playerDone = true;
+                        playerFullyDone = true;
+                    }
+                    if(action == 4){
+                        // ends the loop until the main loop iterates
+                        playerDone = true;
+                    }
+                }
+                playerDone = false;
             }
-            else if(deckTwo[i].getCardType() == "double"){
-                two = "x2";
+            //Drawing the board
+            System.out.println();
+            System.out.println(computer.printHand());
+            System.out.println(computerBoard);
+            System.out.println(playerBoard);
+            System.out.println(player.printHand());
+            if(!computerFullyDone){
+                while(!computerDone){
+                    // asking for action
+                    System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.end turn: ");
+                    int action = sc.nextInt();
+                    if(action == 1){
+                        //adding the card to the board first
+                        computerBoard += cardPrinter(mainDeck[deckIndex]);
+                        //adding its value and then setting it as the last used card
+                        computer.totalValue += mainDeck[deckIndex].value();
+                        computer.lastUsedCard = mainDeck[deckIndex];
+                        mainDeck[deckIndex] = null;
+                        deckIndex--; // since we are drawing cards
+                        computerDone = true;
+                    }
+                    if(action == 2){
+                        int chosenCard = 0;
+                        do{
+                        System.out.print("Select card (1-4): ");
+                        chosenCard = sc.nextInt();
+                        } while(computer.hand[chosenCard-1] == null); // making sure the card is not used before
+
+                        computerBoard += cardPrinter(computer.hand[chosenCard-1]);
+                        computer.useCard(chosenCard);
+                        computerDone = true;
+                    }
+                    if(action == 3){
+                        // breaks out and stays out of loop until the game is over
+                        computerDone = true;
+                        computerFullyDone = true;
+                    }
+                    if(action == 4){
+                        // ends the loop until the main loop iterates
+                        computerDone = true;
+                    }
+                }
+                computerDone = false;
             }
-            else if(deckTwo[i].getCardType() == "flip"){
-                two = "+/-";
-            }
-            System.out.println((i+1) + ". deckOne: " + one + "   deckTwo: " + two);
         }
     }
 
-    public static void main(String[] args){
+    public static void gameStarter(){
         Card[] gameDeck = DeckMaker(40);
         Card[] shuffledDeck = shuffle(gameDeck);
-
         // giving the first 5 cards to each player
         Card[] playerPreDeck = new Card[10];
         Card[] computerPreDeck = new Card[10];
         for(int i = 0; i<(playerPreDeck.length/2); i++){
             playerPreDeck[i] = shuffledDeck[i];
             computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
+            // setting the taken index as null
+            shuffledDeck[i] = null;
+            shuffledDeck[(shuffledDeck.length-1)-i] = null;
+        }
+        
+        // Removing null cards
+        Card[] finalDeck = new Card[30];
+        int indexx = 0;
+        for(int i = 0; i<shuffledDeck.length; i++){
+            if(shuffledDeck[i] != null){
+                finalDeck[indexx] = shuffledDeck[i];
+                indexx++;
+            }
         }
 
         // giving random cards to PreDecks
@@ -200,9 +326,15 @@ public class Bluejack{
         for(int i = 5; i<computerPreDeck.length; i++){
             computerPreDeck[i] = randoms2[i-5];
         }
-
+        // Picking hand cards for each player
         Card[] playerDeck = playerCardPicker(playerPreDeck);
         Card[] computerDeck = playerCardPicker(computerPreDeck);
-        pre_printer(playerDeck, computerDeck);
+
+        gameplay(finalDeck, playerDeck, computerDeck);
+    }
+
+
+    public static void main(String[] args){
+        gameStarter();
     }
 }
