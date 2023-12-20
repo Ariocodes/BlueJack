@@ -1,9 +1,11 @@
 class Player{
     public Card[] hand = new Card[4];
     public int totalValue = 0;
-    public Card lastUsedCard = null; // keeping track of the last card since it's needed for speacial cards
-    public Player(Card[] hnd){
+    public String name = "player";
+    public Card lastUsedCard = new Card(0, "none", true, false); // keeping track of the last card since it's needed for speacial cards
+    public Player(Card[] hnd, String userName){
         hand = hnd;
+        name = userName;
     }
     public void useCard(int cardIndex){
         if(hand[cardIndex-1].getCardType() == "normal"){
@@ -25,7 +27,7 @@ class Player{
             hand[cardIndex-1] = null;
         }
     }
-    public String printHand(){
+    public String printHand(int score){
         String ANSI_RESET = "\u001B[0m";
         String ANSI_BLUE = "\u001B[36m";
         String ANSI_YELLOW = "\u001B[33m";
@@ -61,6 +63,6 @@ class Player{
             }
         }
         text += " |";
-        return "Player's hand:    | " + text + "Board total: " + totalValue;
+        return name + "'s hand:    | " + text + "Board total: " + totalValue + "  games won: " + score;
     }
 }

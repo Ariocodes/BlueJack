@@ -1,5 +1,9 @@
 import java.util.Random;
 import java.util.Scanner;
+import java.lang.Math;
+import java.nio.file.Paths;
+import java.util.Formatter;
+import java.io.IOException;
 
 public class Bluejack{
     public static Card[] DeckMaker(int amountOfCards){
@@ -108,7 +112,7 @@ public class Bluejack{
                 result[i] = new Card(randValue, color, isPositive, false);
             }
             else{
-                chance = rand.nextInt(1, 6);
+                chance = rand.nextInt(1,6);
                 switch(chance){
                     case 1:
                     case 2:
@@ -180,120 +184,72 @@ public class Bluejack{
         }
         return text;
     }
+    
+    public static void scoreOutput(String playerN, int[] scores){
+        /*
+        This function is used to print the scores and the winner int the consol,
+        and save the scores in the text file called "Scores.txt"
+        */
+        String scoreboard = playerN + ": " + scores[0] + "  |  Computer: " + scores[1];
+        if(scores[0] == 3){
+            System.out.println(playerN + " won the game!");
+            System.out.println(scoreboard);
+        }
+        else if(scores[1] == 3){
+            System.out.println("Computer won the game!");
+            System.out.println(scoreboard);
+        }
 
-    public static void gameplay(Card[] mainDeck, Card[] playerDeck, Card[] computerDeck){
-        Scanner sc = new Scanner(System.in);
-        Random rd = new Random();
-        Player player = new Player(playerDeck);
-        Computer computer = new Computer(computerDeck);
-
-        System.out.print("Press Enter to start!");
-        String started = sc.nextLine();
-        
-        boolean winner = false;
-        boolean winnerIsPlayer = false;
-        int[] scores = {0, 0};
-
-        String computerBoard = "Computer's board: | ";
-        String playerBoard = "Player's board:   | ";
-        int deckIndex = 29;
-        boolean playerDone = false;
-        boolean playerFullyDone = false;
-        boolean computerFullyDone = false;
-        boolean computerDone = false;
-        while(!winner){
-            //Drawing the board
-            System.out.println();
-            System.out.println(computer.printHand());
-            System.out.println(computerBoard);
-            System.out.println(playerBoard);
-            System.out.println(player.printHand());
-            if(!playerFullyDone){
-                while(!playerDone){
-                    // asking for action
-                    System.out.print("Player: 1.draw, 2.card, 3.stand, 4.end turn: ");
-                    int action = sc.nextInt();
-                    if(action == 1){
-                        //adding the card to the board first
-                        playerBoard += cardPrinter(mainDeck[deckIndex]);
-                        //adding its value and then setting it as the last used card
-                        player.totalValue += mainDeck[deckIndex].value();
-                        player.lastUsedCard = mainDeck[deckIndex];
-                        mainDeck[deckIndex] = null;
-                        deckIndex--; // since we are drawing cards
-                        playerDone = true;
-                    }
-                    if(action == 2){
-                        int chosenCard = 0;
-                        do{
-                        System.out.print("Select card (1-4): ");
-                        chosenCard = sc.nextInt();
-                        } while(player.hand[chosenCard-1] == null); // making sure the card is not used before
-
-                        playerBoard += cardPrinter(player.hand[chosenCard-1]);
-                        player.useCard(chosenCard);
-                        playerDone = true;
-                    }
-                    if(action == 3){
-                        // breaks out and stays out of loop until the game is over
-                        playerDone = true;
-                        playerFullyDone = true;
-                    }
-                    if(action == 4){
-                        // ends the loop until the main loop iterates
-                        playerDone = true;
-                    }
-                }
-                playerDone = false;
+        Scanner reader = null;
+        Formatter f = null;
+        int numberOfLines = 0;
+        int overload = 0;
+        String[] scoresList = new String[10];
+        String[] readingList = new String[15];
+        try{
+            reader = new Scanner(Paths.get("Scores.txt"));
+            while(reader.hasNextLine()){
+                readingList[numberOfLines] = reader.nextLine();
+                numberOfLines++;
             }
-            //Drawing the board
-            System.out.println();
-            System.out.println(computer.printHand());
-            System.out.println(computerBoard);
-            System.out.println(playerBoard);
-            System.out.println(player.printHand());
-            if(!computerFullyDone){
-                while(!computerDone){
-                    // asking for action
-                    System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.end turn: ");
-                    int action = sc.nextInt();
-                    if(action == 1){
-                        //adding the card to the board first
-                        computerBoard += cardPrinter(mainDeck[deckIndex]);
-                        //adding its value and then setting it as the last used card
-                        computer.totalValue += mainDeck[deckIndex].value();
-                        computer.lastUsedCard = mainDeck[deckIndex];
-                        mainDeck[deckIndex] = null;
-                        deckIndex--; // since we are drawing cards
-                        computerDone = true;
-                    }
-                    if(action == 2){
-                        int chosenCard = 0;
-                        do{
-                        System.out.print("Select card (1-4): ");
-                        chosenCard = sc.nextInt();
-                        } while(computer.hand[chosenCard-1] == null); // making sure the card is not used before
-
-                        computerBoard += cardPrinter(computer.hand[chosenCard-1]);
-                        computer.useCard(chosenCard);
-                        computerDone = true;
-                    }
-                    if(action == 3){
-                        // breaks out and stays out of loop until the game is over
-                        computerDone = true;
-                        computerFullyDone = true;
-                    }
-                    if(action == 4){
-                        // ends the loop until the main loop iterates
-                        computerDone = true;
-                    }
+            reader = new Scanner(Paths.get("Scores.txt")); // to start from the first line again
+            overload = numberOfLines - 10;
+            if(overload>0){
+                for(int i = 0; i<10; i++){
+                    scoresList[i] = readingList[overload+i];
                 }
-                computerDone = false;
+                f = new Formatter("Scores.txt");
+                for(int i = 0; i<10; i++){
+                    f.format(scoresList[i]);
+                }
+            }
+            if(numberOfLines<10){
+                readingList[9] = scoreboard;
+                f = new Formatter("Scores.txt");
+                for(int i = 0; i<numberOfLines; i++){
+                    System.out.println(readingList[i]);
+                    f.format(readingList[i]);
+                }
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }finally{
+            if(reader != null){
+                reader.close();
+            }
+            if(f != null){
+                f.close();
             }
         }
     }
 
-    public static void gameStarter(){
+    public static void gameStarter(String playerN){
+        /*
+        This function makes the main deck, shuffles it, makes the 5 random cards,
+        mixes them and then gives 4 cards to each player and keeps on restarting
+        the game until player or computer has reached the score of 3. Then it 
+        calls the scoreOutput function.
+        */
         Card[] gameDeck = DeckMaker(40);
         Card[] shuffledDeck = shuffle(gameDeck);
         // giving the first 5 cards to each player
@@ -302,11 +258,10 @@ public class Bluejack{
         for(int i = 0; i<(playerPreDeck.length/2); i++){
             playerPreDeck[i] = shuffledDeck[i];
             computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
-            // setting the taken index as null
+            // setting the taken indexes as null
             shuffledDeck[i] = null;
             shuffledDeck[(shuffledDeck.length-1)-i] = null;
         }
-        
         // Removing null cards
         Card[] finalDeck = new Card[30];
         int indexx = 0;
@@ -316,7 +271,6 @@ public class Bluejack{
                 indexx++;
             }
         }
-
         // giving random cards to PreDecks
         Card[] randoms1 = randomCards(5);
         for(int i = 5; i<playerPreDeck.length; i++){
@@ -329,12 +283,305 @@ public class Bluejack{
         // Picking hand cards for each player
         Card[] playerDeck = playerCardPicker(playerPreDeck);
         Card[] computerDeck = playerCardPicker(computerPreDeck);
-
-        gameplay(finalDeck, playerDeck, computerDeck);
+        int[] scores = {0, 0};
+        // index 0 for Player, index 1 for Computer.
+        while(!(scores[0] == 3 || scores[1] == 3)){ // unless player or computer scores are not equal to 3
+            String status = gameplay(finalDeck, playerDeck, computerDeck, playerN, scores);
+            if(status == "Player"){ // if winner is player
+                scores[0]++;
+            }
+            else if(status == "Computer"){ // if winner is computer
+                scores[1]++;
+            }
+            else if(status == "PlayerACE"){
+                scores[0] = 3;
+            }
+            else if(status == "ComputerACE"){
+                scores[1] = 3;
+            }
+            gameDeck = DeckMaker(40);
+            shuffledDeck = shuffle(gameDeck);
+            // giving the first 5 cards to each player
+            playerPreDeck = new Card[10];
+            computerPreDeck = new Card[10];
+            for(int i = 0; i<(playerPreDeck.length/2); i++){
+                playerPreDeck[i] = shuffledDeck[i];
+                computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
+                // setting the taken indexes as null
+                shuffledDeck[i] = null;
+                shuffledDeck[(shuffledDeck.length-1)-i] = null;
+            }
+            // Removing null cards
+            finalDeck = new Card[30];
+            indexx = 0;
+            for(int i = 0; i<shuffledDeck.length; i++){
+                if(shuffledDeck[i] != null){
+                    finalDeck[indexx] = shuffledDeck[i];
+                    indexx++;
+                }
+            }
+            // giving random cards to PreDecks
+            randoms1 = randomCards(5);
+            for(int i = 5; i<playerPreDeck.length; i++){
+                playerPreDeck[i] = randoms1[i-5];
+            }
+            randoms2 = randomCards(5);
+            for(int i = 5; i<computerPreDeck.length; i++){
+                computerPreDeck[i] = randoms2[i-5];
+            }
+            // Picking hand cards for each player
+            playerDeck = playerCardPicker(playerPreDeck);
+            computerDeck = playerCardPicker(computerPreDeck);
+        }
+        scoreOutput(playerN, scores);
     }
 
+    public static String gameplay(Card[] mainDeck, Card[] playerDeck, Card[] computerDeck, String playerName, int[] score){
+        /*
+        This function consists of the whole gameplay (printing the board, asking user for action,
+        and deciding on who has won)
+        */
+        Scanner sc = new Scanner(System.in);
+        Random rd = new Random();
+        Player player = new Player(playerDeck, playerName);
+        Computer computer = new Computer(computerDeck);
 
+        System.out.print("Press Enter to start!");
+        String started = sc.nextLine();
+        
+        boolean winner = false;
+        String whoWon = "";
+
+        String computerBoard = "Computer's board: | ";
+        String playerBoard = playerName + "'s board:   | ";
+        int amountOfCardsOnPlayerBoard = 0; // to keep track of cards on boards
+        int amountOfCardsOnComputerBoard = 0;
+        int deckIndex = 29;
+
+        boolean playerDone = false; // for skip
+        boolean playerFullyDone = false; // for stand
+        boolean playerIsAllBlue = true; // if all cards on board are blue
+        
+        boolean computerDone = false;
+        boolean computerFullyDone = false;
+        boolean computerIsAllBlue = true;
+        //Drawing the board
+        System.out.println();
+        System.out.println(computer.printHand(score[1]));
+        System.out.println(computerBoard);
+        System.out.println(playerBoard);
+        System.out.println(player.printHand(score[0]));
+        while(!winner){
+            if(!playerFullyDone){
+                while(!playerDone){
+                    // asking for action
+                    System.out.print(playerName + ": 1.draw, 2.card, 3.stand, 4.end turn (1-4): ");
+                    int action = sc.nextInt();
+                    while(action != 1 && action != 2 && action != 3 && action != 4){
+                        System.out.print("Wrong input. ");
+                        System.out.print(playerName + ": 1.draw, 2.card, 3.stand, 4.end turn (1-4): ");
+                        action = sc.nextInt();
+                    }
+                    if(action == 1){
+                        //adding the card to the board first
+                        playerBoard += cardPrinter(mainDeck[deckIndex]);
+                        //adding its value and then setting it as the last used card
+                        player.totalValue += mainDeck[deckIndex].value();
+                        player.lastUsedCard = mainDeck[deckIndex];
+                        if(player.lastUsedCard.color() != "Blue"){
+                            playerIsAllBlue = false;
+                        }
+                        mainDeck[deckIndex] = null;
+                        deckIndex--; // since we are drawing cards
+                        playerDone = true;
+                        amountOfCardsOnPlayerBoard++;
+                    }
+                    else if(action == 2){
+                        int chosenCard = 0;
+                        do{
+                        System.out.print("Select card (1-4): ");
+                        chosenCard = sc.nextInt();
+                        } while(player.hand[chosenCard-1] == null); // making sure the card is not used before
+
+                        playerBoard += cardPrinter(player.hand[chosenCard-1]);
+                        player.useCard(chosenCard);
+                        if(player.lastUsedCard.color() != "Blue"){
+                            playerIsAllBlue = false;
+                        }
+                        playerDone = true;
+                        amountOfCardsOnPlayerBoard++;
+                    }
+                    else if(action == 3){
+                        // breaks out and stays out of loop until the game is over
+                        playerDone = true;
+                        playerFullyDone = true;
+                    }
+                    else if(action == 4){
+                        // ends the loop until the main loop iterates
+                        playerDone = true;
+                    }
+                }
+                playerDone = false;
+            }
+            //Drawing the board
+            System.out.println();
+            System.out.println(computer.printHand(score[1]));
+            System.out.println(computerBoard);
+            System.out.println(playerBoard);
+            System.out.println(player.printHand(score[0]));
+            if(!computerFullyDone){
+                while(!computerDone){
+                    // asking for action
+                    System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.skip turn (1-4): ");
+                    int action = sc.nextInt();
+                    while(action != 1 && action != 2 && action != 3 && action != 4){
+                        System.out.print("Wrong input. ");
+                        System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.end turn (1-4): ");
+                        action = sc.nextInt();
+                    }
+                    if(action == 1){
+                        //adding the card to the board first
+                        computerBoard += cardPrinter(mainDeck[deckIndex]);
+                        //adding its value and then setting it as the last used card
+                        computer.totalValue += mainDeck[deckIndex].value();
+                        computer.lastUsedCard = mainDeck[deckIndex];
+                        if(computer.lastUsedCard.color() != "Blue"){
+                            computerIsAllBlue = false;
+                        }
+                        mainDeck[deckIndex] = null;
+                        deckIndex--; // since we are drawing cards
+                        computerDone = true;
+                        amountOfCardsOnComputerBoard++;
+                    }
+                    else if(action == 2){
+                        int chosenCard = 0;
+                        do{
+                        System.out.print("Select card (1-4): ");
+                        chosenCard = sc.nextInt();
+                        } while(computer.hand[chosenCard-1] == null); // making sure the card is not used before
+
+                        computerBoard += cardPrinter(computer.hand[chosenCard-1]);
+                        computer.useCard(chosenCard);
+                        if(computer.lastUsedCard.color() != "Blue"){
+                            computerIsAllBlue = false;
+                        }
+                        computerDone = true;
+                        amountOfCardsOnComputerBoard++;
+                    }
+                    else if(action == 3){
+                        // breaks out and stays out of loop until the game is over
+                        computerDone = true;
+                        computerFullyDone = true;
+                    }
+                    else if(action == 4){
+                        // ends the loop until the main loop iterates
+                        computerDone = true;
+                    }
+                }
+                computerDone = false;
+            }
+            //Drawing the board
+            System.out.println();
+            System.out.println(computer.printHand(score[1]));
+            System.out.println(computerBoard);
+            System.out.println(playerBoard);
+            System.out.println(player.printHand(score[0]));
+            if(player.totalValue == 20 && computer.totalValue == 20){
+                System.out.println("Tie!");
+                winner = true;
+                whoWon = "none";
+            }
+            else if(player.totalValue == 20){
+                if(playerIsAllBlue){
+                    System.out.println("Player Aced!");
+                    whoWon = "PlayerACE";
+                }
+                else{
+                    System.out.println(playerName + " wins!");
+                    winner = true;
+                    whoWon = "Player";
+                }
+            }
+            else if(computer.totalValue == 20){
+                if(computerIsAllBlue){
+                    System.out.println("Computer Aced!");
+                    whoWon = "ComputerACE";
+                }
+                else{
+                    System.out.println("Computer wins!");
+                    winner = true;
+                    whoWon = "Computer";
+                }
+            }
+            else if(player.totalValue > 20 || computer.totalValue > 20){
+                if(player.totalValue > computer.totalValue){
+                    System.out.println(playerName + " busted! (total>20) Computer Wins!");
+                    winner = true;
+                    whoWon = "Computer";
+                }
+                if(computer.totalValue > player.totalValue){
+                    System.out.println("Computer busted! (total>20) " + playerName + " wins!");
+                    winner = true;
+                    whoWon = "Player";
+                }
+            }
+            else if(amountOfCardsOnPlayerBoard == 9){
+                System.out.println(playerName + " wins! (9 cards on board and total bellow or equal to 20)");
+                winner = true;
+                whoWon = "Player";
+            }
+            else if(amountOfCardsOnComputerBoard == 9){
+                System.out.println("Computer wins! (9 cards on board and total bellow or equal to 20)");
+                winner = true;
+                whoWon = "Computer";
+            }
+            else{
+                if(playerFullyDone && computerFullyDone){
+                    int diffPlayer = (int)Math.sqrt(Math.pow(player.totalValue - 20, 2));
+                    int diffComputer = (int)Math.sqrt(Math.pow(computer.totalValue - 20, 2));
+                    if(diffPlayer < diffComputer){
+                        System.out.println(playerName + " wins!");
+                        winner = true;
+                        whoWon = "Player";
+                    }
+                    else if(diffComputer < diffPlayer){
+                        System.out.println("Computer wins!");
+                        winner = true;
+                        whoWon = "Computer";
+                    }
+                    else if(diffComputer == diffPlayer){
+                        System.out.println("Tie!");
+                        winner = true;
+                        whoWon = "none";
+                    }
+                }
+            }
+        }
+        computer.lastUsedCard = new Card(0, "none", true, false);
+        player.lastUsedCard = new Card(0, "none", true, false);
+        return whoWon;
+    }
+
+    // public static void saver(){
+
+    // }
     public static void main(String[] args){
-        gameStarter();
+        Scanner sc = new Scanner(System.in);
+        String playerName = "Player";
+        String again = "y";
+        while(again.equals("Y") || again.equals("y")){
+            System.out.print("Enter your name: ");
+            playerName = sc.nextLine();
+            gameStarter(playerName);
+            System.out.println("Game over!");
+            System.out.print("Want to play again?(y/n): ");
+            again = sc.nextLine();
+            while(!again.equals("Y") && !again.equals("y") && !again.equals("N") && !again.equals("n")){
+                System.out.println("wrong input.");
+                System.out.print("Want to play again?(y/n): ");
+                again = sc.nextLine();
+            }
+        }
+
     }
 }

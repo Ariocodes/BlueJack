@@ -1,7 +1,7 @@
 class Computer{
     public Card[] hand = new Card[4];
     public int totalValue = 0;
-    public Card lastUsedCard = null; // keeping track of the last card since it's needed for speacial cards
+    public Card lastUsedCard = new Card(0, "none", true, false); // keeping track of the last card since it's needed for speacial cards
     public Computer(Card[] hnd){
         hand = hnd;
     }
@@ -25,7 +25,7 @@ class Computer{
             hand[cardIndex-1] = null;
         }
     }
-    public String printHand(){
+    public String printHand(int score){
         String ANSI_RESET = "\u001B[0m";
         String ANSI_BLUE = "\u001B[36m";
         String ANSI_YELLOW = "\u001B[33m";
@@ -61,6 +61,6 @@ class Computer{
             }
         }
         text += " |";
-        return "Computer's Hand:  | " + text + "Board total: " + totalValue;
+        return "Computer's Hand:  | " + text + "Board total: " + totalValue + "  games won: " + score;
     }
 }
