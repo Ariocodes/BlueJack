@@ -9,16 +9,19 @@ class Player{
         if(hand[cardIndex-1].getCardType() == "normal"){
             // adds up for normal cards
             totalValue += hand[cardIndex-1].value();
+            lastUsedCard = hand[cardIndex-1];
             hand[cardIndex-1] = null;
         }
         else if(hand[cardIndex-1].getCardType() == "double"){
             // doubles the last used card's value
             totalValue += lastUsedCard.value();
+            lastUsedCard = hand[cardIndex-1];
             hand[cardIndex-1] = null;
         }
         else if(hand[cardIndex-1].getCardType() == "flip"){
             // flips the sign of the last used card
             totalValue += (lastUsedCard.value() * -1) - lastUsedCard.value();
+            lastUsedCard = hand[cardIndex-1];
             hand[cardIndex-1] = null;
         }
     }
