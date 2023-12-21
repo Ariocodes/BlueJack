@@ -4,6 +4,9 @@ import java.lang.Math;
 import java.nio.file.Paths;
 import java.util.Formatter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 public class Bluejack{
     public static Card[] DeckMaker(int amountOfCards){
@@ -190,7 +193,11 @@ public class Bluejack{
         This function is used to print the scores and the winner int the consol,
         and save the scores in the text file called "Scores.txt"
         */
-        String scoreboard = playerN + ": " + scores[0] + "  |  Computer: " + scores[1];
+        LocalDateTime dt = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd  HH:mm:ss");
+        String formattedDate = dt.format(formatter);
+
+        String scoreboard = playerN + ": " + scores[0] + "  |  Computer: " + scores[1] + " | " + formattedDate;
         if(scores[0] == 3){
             System.out.println(playerN + " won the game!");
             System.out.println(scoreboard);
@@ -205,7 +212,7 @@ public class Bluejack{
         int numberOfLines = 0;
         int overload = 0;
         String[] scoresList = new String[10];
-        String[] readingList = new String[15];
+        String[] readingList = new String[20];
         try{
             reader = new Scanner(Paths.get("Scores.txt"));
             while(reader.hasNextLine()){
@@ -213,22 +220,23 @@ public class Bluejack{
                 numberOfLines++;
             }
             reader = new Scanner(Paths.get("Scores.txt")); // to start from the first line again
-            overload = numberOfLines - 10;
+            overload = numberOfLines - 9;
             if(overload>0){
+                readingList[numberOfLines] = scoreboard; // 11th index 12th value
                 for(int i = 0; i<10; i++){
-                    scoresList[i] = readingList[overload+i];
+                    scoresList[i] = readingList[overload+i]; // indexes: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
                 }
                 f = new Formatter("Scores.txt");
                 for(int i = 0; i<10; i++){
-                    f.format(scoresList[i]);
+                    f.format(scoresList[i] + "\n");
                 }
             }
-            if(numberOfLines<10){
-                readingList[9] = scoreboard;
+            else if(numberOfLines<=10){
+                readingList[numberOfLines] = scoreboard;
                 f = new Formatter("Scores.txt");
-                for(int i = 0; i<numberOfLines; i++){
+                for(int i = 0; i<numberOfLines+1; i++){
                     System.out.println(readingList[i]);
-                    f.format(readingList[i]);
+                    f.format(readingList[i] + "\n");
                 }
             }
         }catch(IOException e){
