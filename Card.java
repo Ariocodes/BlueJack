@@ -14,9 +14,11 @@ class Card{
             switch(cardChance){
                 case 1:
                     cardType = "flip";
+                    val = -8; // for ordering the cards
                     break;
                 case 2:
                     cardType = "double";
+                    val = -7; // for ordering the cards
                     break;
             }
         }

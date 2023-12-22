@@ -179,10 +179,10 @@ public class Bluejack{
         else if(card.color() == "Green"){
             text = String.format(ANSI_GREEN + " [G%3d] " + ANSI_RESET, card.value());
         }
-        if(card.getCardType() == "flip"){
+        else if(card.getCardType() == "flip"){
             text = ANSI_PURPLE + "  [+/-] " + ANSI_RESET;
         }
-        if(card.getCardType() == "double"){
+        else if(card.getCardType() == "double"){
             text = ANSI_PURPLE + "  [x2]  " + ANSI_RESET;
         }
         return text;
@@ -251,6 +251,24 @@ public class Bluejack{
         }
     }
 
+    public static Card[] handOrderer(Card[] hand){
+        Card temp = null;
+        Card[] result = hand;
+        for(int j = 0; j<result.length-1; j++){
+            boolean swapped = false;
+            for(int i = 0; i<result.length-1; i++){
+                if(result[i].value() < result[i+1].value()){
+                    temp = result[i+1];
+                    result[i+1] = result[i];
+                    result[i] = temp;
+                    swapped = true;
+                }
+            }
+            if(!swapped) break;
+        }
+        return result;
+    }
+
     public static void gameStarter(String playerN){
         /*
         This function makes the main deck, shuffles it, makes the 5 random cards,
@@ -258,42 +276,43 @@ public class Bluejack{
         the game until player or computer has reached the score of 3. Then it 
         calls the scoreOutput function.
         */
-        Card[] gameDeck = DeckMaker(40);
-        Card[] shuffledDeck = shuffle(gameDeck);
-        // giving the first 5 cards to each player
-        Card[] playerPreDeck = new Card[10];
-        Card[] computerPreDeck = new Card[10];
-        for(int i = 0; i<(playerPreDeck.length/2); i++){
-            playerPreDeck[i] = shuffledDeck[i];
-            computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
-            // setting the taken indexes as null
-            shuffledDeck[i] = null;
-            shuffledDeck[(shuffledDeck.length-1)-i] = null;
-        }
-        // Removing null cards
-        Card[] finalDeck = new Card[30];
-        int indexx = 0;
-        for(int i = 0; i<shuffledDeck.length; i++){
-            if(shuffledDeck[i] != null){
-                finalDeck[indexx] = shuffledDeck[i];
-                indexx++;
-            }
-        }
-        // giving random cards to PreDecks
-        Card[] randoms1 = randomCards(5);
-        for(int i = 5; i<playerPreDeck.length; i++){
-            playerPreDeck[i] = randoms1[i-5];
-        }
-        Card[] randoms2 = randomCards(5);
-        for(int i = 5; i<computerPreDeck.length; i++){
-            computerPreDeck[i] = randoms2[i-5];
-        }
-        // Picking hand cards for each player
-        Card[] playerDeck = playerCardPicker(playerPreDeck);
-        Card[] computerDeck = playerCardPicker(computerPreDeck);
         int[] scores = {0, 0};
         // index 0 for Player, index 1 for Computer.
         while(!(scores[0] == 3 || scores[1] == 3)){ // unless player or computer scores are not equal to 3
+            Card[] gameDeck = DeckMaker(40);
+            Card[] shuffledDeck = shuffle(gameDeck);
+            // giving the first 5 cards to each player
+            Card[] playerPreDeck = new Card[10];
+            Card[] computerPreDeck = new Card[10];
+            for(int i = 0; i<(playerPreDeck.length/2); i++){
+                playerPreDeck[i] = shuffledDeck[i];
+                computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
+                // setting the taken indexes as null
+                shuffledDeck[i] = null;
+                shuffledDeck[(shuffledDeck.length-1)-i] = null;
+            }
+            // Removing null cards
+            Card[] finalDeck = new Card[30];
+            int indexx = 0;
+            for(int i = 0; i<shuffledDeck.length; i++){
+                if(shuffledDeck[i] != null){
+                    finalDeck[indexx] = shuffledDeck[i];
+                    indexx++;
+                }
+            }
+            // giving random cards to PreDecks
+            Card[] randoms1 = randomCards(5);
+            for(int i = 5; i<playerPreDeck.length; i++){
+                playerPreDeck[i] = randoms1[i-5];
+            }
+            Card[] randoms2 = randomCards(5);
+            for(int i = 5; i<computerPreDeck.length; i++){
+                computerPreDeck[i] = randoms2[i-5];
+            }
+            // Picking hand cards for each player
+            Card[] playerDeck = handOrderer(playerCardPicker(playerPreDeck));
+            Card[] computerDeck = handOrderer(playerCardPicker(computerPreDeck));
+            // starting the gameplay
             String status = gameplay(finalDeck, playerDeck, computerDeck, playerN, scores);
             if(status == "Player"){ // if winner is player
                 scores[0]++;
@@ -307,39 +326,6 @@ public class Bluejack{
             else if(status == "ComputerACE"){
                 scores[1] = 3;
             }
-            gameDeck = DeckMaker(40);
-            shuffledDeck = shuffle(gameDeck);
-            // giving the first 5 cards to each player
-            playerPreDeck = new Card[10];
-            computerPreDeck = new Card[10];
-            for(int i = 0; i<(playerPreDeck.length/2); i++){
-                playerPreDeck[i] = shuffledDeck[i];
-                computerPreDeck[i] = shuffledDeck[(shuffledDeck.length-1)-i];
-                // setting the taken indexes as null
-                shuffledDeck[i] = null;
-                shuffledDeck[(shuffledDeck.length-1)-i] = null;
-            }
-            // Removing null cards
-            finalDeck = new Card[30];
-            indexx = 0;
-            for(int i = 0; i<shuffledDeck.length; i++){
-                if(shuffledDeck[i] != null){
-                    finalDeck[indexx] = shuffledDeck[i];
-                    indexx++;
-                }
-            }
-            // giving random cards to PreDecks
-            randoms1 = randomCards(5);
-            for(int i = 5; i<playerPreDeck.length; i++){
-                playerPreDeck[i] = randoms1[i-5];
-            }
-            randoms2 = randomCards(5);
-            for(int i = 5; i<computerPreDeck.length; i++){
-                computerPreDeck[i] = randoms2[i-5];
-            }
-            // Picking hand cards for each player
-            playerDeck = playerCardPicker(playerPreDeck);
-            computerDeck = playerCardPicker(computerPreDeck);
         }
         scoreOutput(playerN, scores);
     }
@@ -373,6 +359,17 @@ public class Bluejack{
         boolean computerDone = false;
         boolean computerFullyDone = false;
         boolean computerIsAllBlue = true;
+        int computersChosenCard = 0;
+        int computerDoubleCardIndex = 0;
+        int computerFlipCardIndex = 0;
+        boolean computerHasDouble = false;
+        boolean computerHasFlip = false;
+
+        int onlyHandOrder = 3;
+        boolean computerOnlyHand = false;
+        int combination = 0;
+
+
         //Drawing the board
         System.out.println();
         System.out.println(computer.printHand(score[1]));
@@ -412,7 +409,7 @@ public class Bluejack{
                         } while(player.hand[chosenCard-1] == null); // making sure the card is not used before
 
                         playerBoard += cardPrinter(player.hand[chosenCard-1]);
-                        player.useCard(chosenCard);
+                        player.useCard(chosenCard - 1);
                         if(player.lastUsedCard.color() != "Blue"){
                             playerIsAllBlue = false;
                         }
@@ -437,15 +434,255 @@ public class Bluejack{
             System.out.println(computerBoard);
             System.out.println(playerBoard);
             System.out.println(player.printHand(score[0]));
-            if(!computerFullyDone){
+            if(!computerFullyDone){ 
+                // acknowledging if it has any lucky card
+                for(int i = 0; i<computer.hand.length; i++){
+                    if(computer.hand[i].getCardType() == "double"){
+                        computerHasDouble = true;
+                        computerDoubleCardIndex = i;
+                    }
+                    if(computer.hand[i].getCardType() == "flip"){
+                        computerHasFlip = true;
+                        computerFlipCardIndex = i;
+                    }
+                }
                 while(!computerDone){
                     // asking for action
                     System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.skip turn (1-4): ");
-                    int action = sc.nextInt();
-                    while(action != 1 && action != 2 && action != 3 && action != 4){
-                        System.out.print("Wrong input. ");
-                        System.out.print("Computer: 1.draw, 2.card, 3.stand, 4.end turn (1-4): ");
-                        action = sc.nextInt();
+                    int action = 0;
+
+                    if(computer.totalValue + computer.hand[0].value() + computer.hand[1].value() + computer.hand[2].value() + computer.hand[3].value() == 20){ // 1, 2, 3, 4
+                        computerOnlyHand = true;
+                        combination = 1;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[1].value() + computer.hand[2].value() + computer.hand[3].value() == 20){ // 2, 3, 4
+                        computerOnlyHand = true;
+                        combination = 2;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[2].value() + computer.hand[3].value() == 20){ // 1, 3, 4
+                        computerOnlyHand = true;
+                        combination = 3;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[1].value() + computer.hand[3].value() == 20){ // 1, 2, 4
+                        computerOnlyHand = true;
+                        combination = 4;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[1].value() + computer.hand[2].value() == 20){ // 1, 2, 3
+                        computerOnlyHand = true;
+                        combination = 5;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[1].value() == 20){ // 1, 2
+                        computerOnlyHand = true;
+                        combination = 6;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[2].value() == 20){ // 1, 3
+                        computerOnlyHand = true;
+                        combination = 7;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[0].value() + computer.hand[3].value() == 20){ // 1, 4
+                        computerOnlyHand = true;
+                        combination = 8;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[1].value() + computer.hand[2].value() == 20){ // 2, 3
+                        computerOnlyHand = true;
+                        combination = 9;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[1].value() + computer.hand[3].value() == 20){ // 2, 4
+                        computerOnlyHand = true;
+                        combination = 10;
+                        action = 2;
+                    }
+                    else if(computer.totalValue + computer.hand[2].value() + computer.hand[3].value() == 20){ // 3, 4
+                        computerOnlyHand = true;
+                        combination = 11;
+                        action = 2;
+                    }
+
+                    if(computerOnlyHand){
+                        switch(combination){
+                            case 1:
+                                if(onlyHandOrder == 0){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 1){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 2){
+                                    computersChosenCard = 2;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 2:
+                                if(onlyHandOrder == 1){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 2){
+                                    computersChosenCard = 2;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 3:
+                                if(onlyHandOrder == 1){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 2){
+                                    computersChosenCard = 2;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 4:
+                                if(onlyHandOrder == 1){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 2){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 5:
+                                if(onlyHandOrder == 1){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 2){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 2;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 6:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 1;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 7:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 2;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 8:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 0;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 9:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 2;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 10:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 1;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                            case 11:
+                                if(onlyHandOrder == 2){
+                                    computersChosenCard = 2;
+                                }
+                                else if(onlyHandOrder == 3){
+                                    computersChosenCard = 3;
+                                }
+                                onlyHandOrder--;
+                                break;
+                        }
+                    }
+
+                    if(!computerOnlyHand){
+                        if(computer.totalValue < 10){
+                            action = 1;
+                            System.out.println(action);
+                        }
+                        boolean canComplete = false;
+                        if(computer.totalValue >= 10){
+                            for(int i = 0; i<computer.hand.length; i++){
+                                if((computer.hand[i].value() + computer.totalValue) == 20){
+                                    action = 2;
+                                    canComplete = true;
+                                    computersChosenCard = i;
+                                }
+                                else if(computer.hand[i].getCardType() == "double"){
+                                    if((computer.totalValue + computer.lastUsedCard.value()) == 20){
+                                        action = 2;
+                                        canComplete = true;
+                                        computersChosenCard = i;
+                                    }
+                                }
+                                else if(computer.hand[i].getCardType() == "flip"){
+                                    if((computer.totalValue - 2 * computer.lastUsedCard.value()) == 20){
+                                        action = 2;
+                                        canComplete = true;
+                                        computersChosenCard = i;
+                                    }
+                                }
+                            }
+                            if(!canComplete){
+                                Random rand = new Random();
+                                int r = rand.nextInt(0,2);
+                                if(r == 0){
+                                    action = 1;
+                                }
+                                else if(r ==1){
+                                    action = 2;
+                                    boolean couldSet = false;
+                                    for(int i = 0; i<4; i++){
+                                        if(computer.hand[i].getCardType() != "none" && computer.hand[i].value() + computer.totalValue <= 20){
+                                            computersChosenCard = i;
+                                            couldSet = true;
+                                        }
+                                    }
+                                    if(!couldSet){
+                                        action = 3;
+                                    }
+                                }
+                                action = 1;
+                            }
+                            System.out.println(action);
+                        }
+                    }
+                    if(computerOnlyHand){
+                        System.out.println(action);
                     }
                     if(action == 1){
                         //adding the card to the board first
@@ -458,121 +695,117 @@ public class Bluejack{
                         }
                         mainDeck[deckIndex] = null;
                         deckIndex--; // since we are drawing cards
-                        computerDone = true;
                         amountOfCardsOnComputerBoard++;
+                        computerDone = true;
                     }
                     else if(action == 2){
-                        int chosenCard = 0;
-                        do{
                         System.out.print("Select card (1-4): ");
-                        chosenCard = sc.nextInt();
-                        } while(computer.hand[chosenCard-1] == null); // making sure the card is not used before
+                        System.out.println(computersChosenCard + 1);
 
-                        computerBoard += cardPrinter(computer.hand[chosenCard-1]);
-                        computer.useCard(chosenCard);
+                        computerBoard += cardPrinter(computer.hand[computersChosenCard]);
+                        computer.useCard(computersChosenCard);
                         if(computer.lastUsedCard.color() != "Blue"){
                             computerIsAllBlue = false;
                         }
-                        computerDone = true;
                         amountOfCardsOnComputerBoard++;
+                        computerDone = true;
                     }
                     else if(action == 3){
                         // breaks out and stays out of loop until the game is over
-                        computerDone = true;
                         computerFullyDone = true;
+                        computerDone = true;
                     }
                     else if(action == 4){
                         // ends the loop until the main loop iterates
                         computerDone = true;
                     }
+                    
+                    // computerDone = true;
                 }
                 computerDone = false;
-            }
-            //Drawing the board
-            System.out.println();
-            System.out.println(computer.printHand(score[1]));
-            System.out.println(computerBoard);
-            System.out.println(playerBoard);
-            System.out.println(player.printHand(score[0]));
-            if(player.totalValue == 20 && computer.totalValue == 20){
-                System.out.println("Tie!");
-                winner = true;
-                whoWon = "none";
-            }
-            else if(player.totalValue == 20){
-                if(playerIsAllBlue){
-                    System.out.println("Player Aced!");
-                    whoWon = "PlayerACE";
-                }
-                else{
-                    System.out.println(playerName + " wins!");
+                //Drawing the board
+                System.out.println();
+                System.out.println(computer.printHand(score[1]));
+                System.out.println(computerBoard);
+                System.out.println(playerBoard);
+                System.out.println(player.printHand(score[0]));
+                if(player.totalValue == 20 && computer.totalValue == 20){
+                    System.out.println("Tie!");
                     winner = true;
-                    whoWon = "Player";
+                    whoWon = "none";
                 }
-            }
-            else if(computer.totalValue == 20){
-                if(computerIsAllBlue){
-                    System.out.println("Computer Aced!");
-                    whoWon = "ComputerACE";
-                }
-                else{
-                    System.out.println("Computer wins!");
-                    winner = true;
-                    whoWon = "Computer";
-                }
-            }
-            else if(player.totalValue > 20 || computer.totalValue > 20){
-                if(player.totalValue > computer.totalValue){
-                    System.out.println(playerName + " busted! (total>20) Computer Wins!");
-                    winner = true;
-                    whoWon = "Computer";
-                }
-                if(computer.totalValue > player.totalValue){
-                    System.out.println("Computer busted! (total>20) " + playerName + " wins!");
-                    winner = true;
-                    whoWon = "Player";
-                }
-            }
-            else if(amountOfCardsOnPlayerBoard == 9){
-                System.out.println(playerName + " wins! (9 cards on board and total bellow or equal to 20)");
-                winner = true;
-                whoWon = "Player";
-            }
-            else if(amountOfCardsOnComputerBoard == 9){
-                System.out.println("Computer wins! (9 cards on board and total bellow or equal to 20)");
-                winner = true;
-                whoWon = "Computer";
-            }
-            else{
-                if(playerFullyDone && computerFullyDone){
-                    int diffPlayer = (int)Math.sqrt(Math.pow(player.totalValue - 20, 2));
-                    int diffComputer = (int)Math.sqrt(Math.pow(computer.totalValue - 20, 2));
-                    if(diffPlayer < diffComputer){
+                else if(player.totalValue == 20){
+                    if(playerIsAllBlue){
+                        System.out.println("Player Aced!");
+                        whoWon = "PlayerACE";
+                    }
+                    else{
                         System.out.println(playerName + " wins!");
                         winner = true;
                         whoWon = "Player";
                     }
-                    else if(diffComputer < diffPlayer){
+                }
+                else if(computer.totalValue == 20){
+                    if(computerIsAllBlue){
+                        System.out.println("Computer Aced!");
+                        whoWon = "ComputerACE";
+                    }
+                    else{
                         System.out.println("Computer wins!");
                         winner = true;
                         whoWon = "Computer";
                     }
-                    else if(diffComputer == diffPlayer){
-                        System.out.println("Tie!");
+                }
+                else if(player.totalValue > 20 || computer.totalValue > 20){
+                    if(player.totalValue > computer.totalValue){
+                        System.out.println(playerName + " busted! (total>20) Computer Wins!");
                         winner = true;
-                        whoWon = "none";
+                        whoWon = "Computer";
+                    }
+                    if(computer.totalValue > player.totalValue){
+                        System.out.println("Computer busted! (total>20) " + playerName + " wins!");
+                        winner = true;
+                        whoWon = "Player";
+                    }
+                }
+                else if(amountOfCardsOnPlayerBoard == 9){
+                    System.out.println(playerName + " wins! (9 cards on board and total bellow or equal to 20)");
+                    winner = true;
+                    whoWon = "Player";
+                }
+                else if(amountOfCardsOnComputerBoard == 9){
+                    System.out.println("Computer wins! (9 cards on board and total bellow or equal to 20)");
+                    winner = true;
+                    whoWon = "Computer";
+                }
+                else{
+                    if(playerFullyDone && computerFullyDone){
+                        int diffPlayer = (int)Math.sqrt(Math.pow(player.totalValue - 20, 2));
+                        int diffComputer = (int)Math.sqrt(Math.pow(computer.totalValue - 20, 2));
+                        if(diffPlayer < diffComputer){
+                            System.out.println(playerName + " wins!");
+                            winner = true;
+                            whoWon = "Player";
+                        }
+                        else if(diffComputer < diffPlayer){
+                            System.out.println("Computer wins!");
+                            winner = true;
+                            whoWon = "Computer";
+                        }
+                        else if(diffComputer == diffPlayer){
+                            System.out.println("Tie!");
+                            winner = true;
+                            whoWon = "none";
+                        }
                     }
                 }
             }
         }
-        computer.lastUsedCard = new Card(0, "none", true, false);
+        computer.lastUsedCard = new Card(0, "none", true, false); // setting as empty for next round
         player.lastUsedCard = new Card(0, "none", true, false);
         return whoWon;
     }
 
-    // public static void saver(){
-
-    // }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         String playerName = "Player";
@@ -590,6 +823,5 @@ public class Bluejack{
                 again = sc.nextLine();
             }
         }
-
     }
 }
