@@ -130,6 +130,7 @@ public class Bluejack{
     }
 
     public static Card[] playerCardPicker(Card[] cardList){
+        // chooses four cards for player hands
         Random rand = new Random();
         Card[] resultArray = new Card[4];
         int[] usedIndexes = {10, 10, 10, 10}; // preset as 10 so the algorithm doesn't bug out (normally preset as 0 and it collides with index0).
