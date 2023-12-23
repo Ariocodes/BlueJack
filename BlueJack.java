@@ -271,7 +271,7 @@ public class Bluejack{
     public static void gameStarter(String playerN){
         /*
         This function makes the main deck, shuffles it, makes the 5 random cards,
-        mixes them and then gives 4 cards to each player and keeps on restarting
+        mixes them and then gives 4 ordered cards to each player and keeps on restarting
         the game until player or computer has reached the score of 3. Then it 
         calls the scoreOutput function.
         */
