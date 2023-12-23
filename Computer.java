@@ -9,7 +9,9 @@ class Computer{
         if(hand[cardIndex].getCardType() == "normal"){
             // adds up for normal cards
             totalValue += hand[cardIndex].value();
-            lastUsedCard = hand[cardIndex];
+            lastUsedCard.setValue(hand[cardIndex].value());
+            lastUsedCard.setColor(hand[cardIndex].color());
+            lastUsedCard.setCardType(hand[cardIndex].getCardType());
             hand[cardIndex].setValue(0);
             hand[cardIndex].setColor("none");
             hand[cardIndex].setCardType("none");
@@ -17,15 +19,19 @@ class Computer{
         else if(hand[cardIndex].getCardType() == "double"){
             // doubles the last used card's value
             totalValue += lastUsedCard.value();
-            lastUsedCard = hand[cardIndex];
+            lastUsedCard.setValue(lastUsedCard.value() * 2);
+            lastUsedCard.setColor(hand[cardIndex].color());
+            lastUsedCard.setCardType(hand[cardIndex].getCardType());
             hand[cardIndex].setValue(0);
             hand[cardIndex].setColor("none");
             hand[cardIndex].setCardType("none");
         }
         else if(hand[cardIndex].getCardType() == "flip"){
             // flips the sign of the last used card
-            totalValue += (lastUsedCard.value() * -1) - lastUsedCard.value();
-            lastUsedCard = hand[cardIndex];
+            totalValue += (lastUsedCard.value() * -2);
+            lastUsedCard.setValue(lastUsedCard.value() * 2);
+            lastUsedCard.setColor(hand[cardIndex].color());
+            lastUsedCard.setCardType(hand[cardIndex].getCardType());
             hand[cardIndex].setValue(0);
             hand[cardIndex].setColor("none");
             hand[cardIndex].setCardType("none");
@@ -65,6 +71,6 @@ class Computer{
             }
         }
         text += " |";
-        return "Computer's Hand:  | " + text + "Board total: " + totalValue + "  games won: " + score;
+        return "Computer's Hand:            | " + text + "Board total: " + totalValue + "    games won: " + score;
     }
 }
