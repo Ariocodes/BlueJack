@@ -38,12 +38,19 @@ class Computer{
         }
     }
     public String printHand(int score){
-        String ANSI_RESET = "\u001B[0m";
-        String ANSI_BLUE = "\u001B[36m";
-        String ANSI_YELLOW = "\u001B[33m";
-        String ANSI_RED = "\u001B[31m";
-        String ANSI_GREEN = "\u001B[32m";
-        String ANSI_PURPLE = "\u001B[35m";
+        String ANSI_RESET = "";
+        String ANSI_BLUE = "";
+        String ANSI_YELLOW = "";
+        String ANSI_RED = "";
+        String ANSI_GREEN = "";
+        String ANSI_PURPLE = "";
+        // COLORS DON'T WORK ON CMD SO I COMMENTED THEM.
+        // String ANSI_RESET = "\u001B[0m";
+        // String ANSI_BLUE = "\u001B[36m";
+        // String ANSI_YELLOW = "\u001B[33m";
+        // String ANSI_RED = "\u001B[31m";
+        // String ANSI_GREEN = "\u001B[32m";
+        // String ANSI_PURPLE = "\u001B[35m";
         String text = "";
         for(int i = 0; i<hand.length; i++){
             if(hand[i].getCardType() == "normal"){

@@ -157,13 +157,19 @@ public class Bluejack{
 
     public static String cardPrinter(Card card){
         // saving colors like so:
-        // NOTE: colors don't work on windows' CMD.
-        String ANSI_RESET = "\u001B[0m";
-        String ANSI_BLUE = "\u001B[36m";
-        String ANSI_YELLOW = "\u001B[33m";
-        String ANSI_RED = "\u001B[31m";
-        String ANSI_GREEN = "\u001B[32m";
-        String ANSI_PURPLE = "\u001B[35m";
+        // COLORS DON'T WORK ON CMD SO I COMMENTED THEM.
+        // String ANSI_RESET = "\u001B[0m";
+        // String ANSI_BLUE = "\u001B[36m";
+        // String ANSI_YELLOW = "\u001B[33m";
+        // String ANSI_RED = "\u001B[31m";
+        // String ANSI_GREEN = "\u001B[32m";
+        // String ANSI_PURPLE = "\u001B[35m";
+        String ANSI_RESET = "";
+        String ANSI_BLUE = "";
+        String ANSI_YELLOW = "";
+        String ANSI_RED = "";
+        String ANSI_GREEN = "";
+        String ANSI_PURPLE = "";
         String text = "";
         if(card.color() == "Blue"){
             text = String.format(ANSI_BLUE + " [B%3d] " + ANSI_RESET, card.value());
